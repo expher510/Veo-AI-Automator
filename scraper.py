@@ -39,12 +39,10 @@ class VeoScraper:
                 await page.evaluate('document.querySelector(".header_top svg.svg-setting").click()')
 
             logger.info(f"Selecting aspect ratio: {aspect_ratio}")
-            await page.wait_for_selector("#aspect-ration")
-            await page.select_option("#aspect-ration", value=aspect_ratio)
+            await page.locator("#aspect-ration").first.select_option(value=aspect_ratio, force=True)
 
             logger.info(f"Entering prompt: {prompt}")
-            await page.wait_for_selector("#fn__include_textarea")
-            await page.fill("#fn__include_textarea", prompt)
+            await page.locator("#fn__include_textarea").first.fill(prompt, force=True)
 
             video_url = None
             async def handle_response(response):
@@ -67,9 +65,15 @@ class VeoScraper:
             elapsed = 0
             while elapsed < max_wait:
                 if video_url: break
-                video_element = await page.query_selector("video source")
+                video_element = await page.query_selector("video")
                 if video_element:
                     video_url = await video_element.get_attribute("src")
+                    if video_url and not video_url.startswith("blob:"):
+                        break
+                
+                download_link = await page.query_selector("a.only-video-download")
+                if download_link:
+                    video_url = await download_link.get_attribute("href")
                     if video_url: break
                 
                 # Check for rate limit error

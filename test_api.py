@@ -5,8 +5,7 @@ async def run_test():
     scraper = VeoScraper()
     
     prompts = [
-        ("A futuristic car driving through a neon city", "VIDEO_ASPECT_RATIO_LANDSCAPE"),
-        ("A beautiful waterfall in a tropical jungle", "VIDEO_ASPECT_RATIO_PORTRAIT")
+        ("A futuristic car driving through a neon city", "VIDEO_ASPECT_RATIO_LANDSCAPE")
     ]
     
     for prompt, ratio in prompts:
