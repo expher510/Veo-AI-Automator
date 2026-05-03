@@ -1,0 +1,44 @@
+name: Veo Video Generator
+
+on:
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: 'Video Prompt'
+        required: true
+        default: 'A futuristic city'
+      aspect_ratio:
+        description: 'Aspect Ratio (VIDEO_ASPECT_RATIO_LANDSCAPE or VIDEO_ASPECT_RATIO_PORTRAIT)'
+        required: true
+        default: 'VIDEO_ASPECT_RATIO_LANDSCAPE'
+      webhook_url:
+        description: 'Webhook URL to send the result'
+        required: false
+
+  repository_dispatch:
+    types: [generate_video]
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+          playwright install chromium
+          playwright install-deps chromium
+
+      - name: Run Scraper
+        env:
+          VIDEO_PROMPT: ${{ github.event.inputs.prompt || github.event.client_payload.prompt }}
+          VIDEO_ASPECT_RATIO: ${{ github.event.inputs.aspect_ratio || github.event.client_payload.aspect_ratio }}
+          WEBHOOK_URL: ${{ github.event.inputs.webhook_url || github.event.client_payload.webhook_url }}
+        run: python scraper.py
