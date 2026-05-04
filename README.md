@@ -63,7 +63,8 @@ You can trigger video generation from any application by making a simple API cal
   "client_payload": {
     "prompt": "A cinematic shot of a futuristic cyberpunk city in the rain, neon lights",
     "aspect_ratio": "VIDEO_ASPECT_RATIO_LANDSCAPE",
-    "webhook_url": "https://your-webhook-url.com/endpoint"
+    "webhook_url": "https://your-webhook-url.com/endpoint",
+    "job_id": "12345-abcde"
   }
 }
 ```
@@ -74,7 +75,7 @@ You can trigger video generation from any application by making a simple API cal
 1. Go to the **Actions** tab in your repository.
 2. Select **Veo Video Generator** from the left sidebar.
 3. Click **Run workflow**.
-4. Fill in your Prompt, Aspect Ratio, and Webhook URL, then click **Run**.
+4. Fill in your Prompt, Aspect Ratio, Webhook URL, and (optional) Job ID, then click **Run**.
 
 ---
 
@@ -87,7 +88,8 @@ When the generation finishes (usually within 2-3 minutes), your webhook will rec
 {
   "status": "success",
   "prompt": "A cinematic shot of a futuristic cyberpunk city in the rain, neon lights",
-  "video_url": "https://veoaifree.com/wp-content/uploads/vids/example_video.mp4"
+  "video_url": "https://veoaifree.com/wp-content/uploads/vids/example_video.mp4",
+  "job_id": "12345-abcde"
 }
 ```
 
@@ -95,7 +97,8 @@ When the generation finishes (usually within 2-3 minutes), your webhook will rec
 ```json
 {
   "status": "failed",
-  "prompt": "A cinematic shot of a futuristic cyberpunk city in the rain, neon lights"
+  "prompt": "A cinematic shot of a futuristic cyberpunk city in the rain, neon lights",
+  "job_id": "12345-abcde"
 }
 ```
 
