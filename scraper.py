@@ -108,6 +108,7 @@ if __name__ == "__main__":
     prompt = os.getenv("VIDEO_PROMPT", "A beautiful sunrise over the ocean")
     aspect_ratio = os.getenv("VIDEO_ASPECT_RATIO", "VIDEO_ASPECT_RATIO_LANDSCAPE")
     webhook_url = os.getenv("WEBHOOK_URL")
+    job_id = os.getenv("JOB_ID")
 
     logger.info(f"Starting generation for: {prompt} ({aspect_ratio})")
     
@@ -121,10 +122,11 @@ if __name__ == "__main__":
             send_webhook(webhook_url, {
                 "status": "success",
                 "prompt": prompt,
-                "video_url": video_link
+                "video_url": video_link,
+                "job_id": job_id
             })
     else:
         logger.error("Failed to generate video.")
         if webhook_url:
-            send_webhook(webhook_url, {"status": "failed", "prompt": prompt})
+            send_webhook(webhook_url, {"status": "failed", "prompt": prompt, "job_id": job_id})
         sys.exit(1)
