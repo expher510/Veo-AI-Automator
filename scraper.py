@@ -13,6 +13,13 @@ class VeoScraper:
     def __init__(self):
         self.url = "https://veoaifree.com/veo-video-generator/"
 
+    @staticmethod
+    def _normalize_video_url(url: str | None) -> str | None:
+        if not url:
+            return None
+        # Some AJAX responses return /videos/uploads/ (404) while actual file lives under /video/uploads/.
+        return url.replace("/videos/uploads/", "/video/uploads/")
+
     async def generate_video(self, prompt: str, aspect_ratio: str = "VIDEO_ASPECT_RATIO_LANDSCAPE"):
         async with async_playwright() as p:
             # We don't use a fixed proxy here as GitHub provides fresh IPs
@@ -52,28 +59,28 @@ class VeoScraper:
                         data = await response.json()
                         if data and isinstance(data, dict):
                             if "data" in data and "url" in data["data"]:
-                                video_url = data["data"]["url"]
+                                video_url = self._normalize_video_url(data["data"]["url"])
                             elif "url" in data:
-                                video_url = data["url"]
+                                video_url = self._normalize_video_url(data["url"])
                     except: pass
 
             page.on("response", handle_response)
             await page.click("#generate_it")
 
             logger.info("Waiting for video generation...")
-            max_wait = 180
+            max_wait = int(os.getenv("MAX_WAIT_SECONDS", "360"))
             elapsed = 0
             while elapsed < max_wait:
                 if video_url: break
                 video_element = await page.query_selector("video")
                 if video_element:
-                    video_url = await video_element.get_attribute("src")
+                    video_url = self._normalize_video_url(await video_element.get_attribute("src"))
                     if video_url and not video_url.startswith("blob:"):
                         break
                 
                 download_link = await page.query_selector("a.only-video-download")
                 if download_link:
-                    video_url = await download_link.get_attribute("href")
+                    video_url = self._normalize_video_url(await download_link.get_attribute("href"))
                     if video_url: break
                 
                 # Check for rate limit error
